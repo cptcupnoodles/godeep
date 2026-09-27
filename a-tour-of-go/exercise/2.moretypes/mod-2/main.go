@@ -1,17 +1,23 @@
 package main
 
-func main() {
+import (
+	"strings"
+
+	"golang.org/x/tour/wc"
+)
+
+func WordCount(s string) map[string]int {
 	m := make(map[string]int)
+	words := strings.Fields(s)
 
-	// Spin up Thread A to constantly write to the map
-	go func() {
-		for {
-			m["key"] = 1
-		}
-	}()
+	for _, word := range words {
+		m[word]++
 
-	// Spin up Thread B to constantly write to the same map
-	for {
-		m["key"] = 2
 	}
+
+	return m
+}
+
+func main() {
+	wc.Test(WordCount)
 }

@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Server struct {
 	IP        string
 	Weight    int
@@ -18,7 +16,7 @@ func main() {
 	registry := make([]Server, 0, 5)
 	// Print baseline metrics to verify capacity layout
 	// fmt.Println("Baseline:", len(registry), cap(registry))
-	fmt.Println("Baseline:", len(registry), cap(registry))
+	// fmt.Println("Baseline:", len(registry), cap(registry))
 
 	// ====================================================================
 	// STEP 2: INGEST NETWORK METADATA
@@ -45,7 +43,7 @@ func main() {
 	// Do NOT copy the data; it must point to the identical underlying array.
 	highPriorityTable := registry[2:]
 	// TODO: Print the contents, length, and remaining capacity of 'highPriorityTable'.
-	fmt.Println(highPriorityTable, len(highPriorityTable), cap(highPriorityTable))
+	// fmt.Println(highPriorityTable, len(highPriorityTable), cap(highPriorityTable))
 
 	// ====================================================================
 	// STEP 4: ZERO-COPY POINTER MUTATIONS
@@ -63,9 +61,10 @@ func main() {
 	// TODO: Print the 'highPriorityTable' slice content again.
 	// Observe whether the changes made via the pointer in Step 4 automatically
 	// reflect inside this window slice without any manual reassignment.
-	fmt.Println("highPT:\n", highPriorityTable)
+	// fmt.Println("highPT:\n", highPriorityTable)
 	// TODO: Print the memory addresses (%p) of the element at index 2 in
 	// 'registry' versus the element at index 0 in 'highPriorityTable' to
 	// mathematically prove they point to the identical coordinate in RAM.
-	fmt.Printf("Registry: %p vs highPT: %p \n", &registry[2], &highPriorityTable[0])
+	// fmt.Printf("Registry: %p vs highPT: %p \n", &registry[2], &highPriorityTable[0])
+	_ = highPriorityTable // Keeps the compiler from complaining about an unused variable
 }
