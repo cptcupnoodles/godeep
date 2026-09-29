@@ -28,12 +28,6 @@ func mostCommon(counts map[string]int) (word string, count int) {
 
 func removeWord(counts map[string]int, word string) bool {
 
-	_, ok := counts[word]
-
-	if !ok {
-		return false
-	}
-
 	delete(counts, word)
 
 	return true
@@ -48,7 +42,7 @@ func main() {
 	fmt.Println(words)
 	fmt.Println(counts)
 	fmt.Println(mostCommon(counts))
-	fmt.Println(removeWord(counts, "code"))
+	fmt.Println(removeWord(counts, "x"))
 	fmt.Println(counts)
 
 }

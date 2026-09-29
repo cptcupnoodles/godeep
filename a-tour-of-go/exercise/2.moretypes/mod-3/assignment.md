@@ -45,14 +45,6 @@ func removeWord(counts map[string]int, word string) bool
 
 Before removal, the most common word is `go` with count `3`. Removing `code` returns `true`; afterward, looking up `counts["code"]` gives the zero value `0`, and the key is absent.
 
-### Explain
-
-Answer these questions in comments or a separate notes file:
-
-1. Why can you read from a nil map but not assign a key into one?
-2. Why does looking up a missing key return the element type's zero value?
-3. Why is a map's iteration order not suitable for choosing a deterministic tie winner?
-
 ## Review rubric
 
 This exercise is worth 100 points:

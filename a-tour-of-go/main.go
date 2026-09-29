@@ -52,5 +52,6 @@ func main() {
 
 	//cmoretypes.Maps()
 	//cmoretypes.MapLiteral()
-	cmoretypes.MutatingMaps()
+	//cmoretypes.MutatingMaps()
+	cmoretypes.FunctionValues()
 }
