@@ -1,6 +1,6 @@
 package main
 
-import "example.com/m/cmoretypes"
+import "example.com/m/dmethods"
 
 func main() {
 	// abasic.Zero()
@@ -53,5 +53,9 @@ func main() {
 	//cmoretypes.Maps()
 	//cmoretypes.MapLiteral()
 	//cmoretypes.MutatingMaps()
-	cmoretypes.FunctionValues()
+	//cmoretypes.FunctionValues()
+	//cmoretypes.FunctionClosure()
+	//dmethods.Methods()
+	//dmethods.MethodsContinue()
+	dmethods.MethodsPointers()
 }
