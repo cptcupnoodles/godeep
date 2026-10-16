@@ -57,5 +57,14 @@ func main() {
 	//cmoretypes.FunctionClosure()
 	//dmethods.Methods()
 	//dmethods.MethodsContinue()
-	dmethods.MethodsPointers()
+	//dmethods.MethodsPointers()
+
+	// dmethods.Indirection()
+	// dmethods.MethodsWithPointerReceiver()
+	// dmethods.Interface()
+	//dmethods.InterfaceValue()
+	//dmethods.EmptyInterface()
+	//dmethods.TypeAssertions()
+	//dmethods.TypeSwitches()
+	dmethods.Stringer()
 }

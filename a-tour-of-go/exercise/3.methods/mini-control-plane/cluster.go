@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "strconv"
 
 type Cluster struct {
 	Name  string
@@ -39,8 +39,10 @@ func (c Cluster) HealthyNodes() int {
 func (c *Cluster) ScheduleWorkload(cpu int, memory int) *Node {
 	for i := range c.Nodes {
 		if c.Nodes[i].AvailableCPU() >= cpu && c.Nodes[i].AvailableMemory() >= memory {
-			c.Nodes[i].Schedule(cpu, memory)
-			return &c.Nodes[i]
+			scheduled := c.Nodes[i].Schedule(cpu, memory)
+			if scheduled {
+				return &c.Nodes[i]
+			}
 		}
 	}
 	return nil
@@ -50,11 +52,7 @@ func (c *Cluster) DrainNode(name string) bool {
 	for i := range c.Nodes {
 		node := &c.Nodes[i]
 		if node.Name == name {
-			node.UsedCPU += node.AvailableCPU()
-			node.UsedMemory += node.AvailableMemory()
-			node.MarkUnhealthy()
 			node.Drain()
-			fmt.Println(node)
 			return true
 		}
 	}
@@ -62,17 +60,67 @@ func (c *Cluster) DrainNode(name string) bool {
 }
 
 func (c *Cluster) RecoverNode(name string) bool {
-	return true
+	for i := range c.Nodes {
+		node := &c.Nodes[i]
+		if node.Name == name {
+			node.MarkHealthy()
+			node.Undrain()
+			return true
+		}
+	}
+	return false
 }
 
 func (c Cluster) TotalAvailableCPU() int {
-	return 0
+	t := 0
+	for i := range c.Nodes {
+		if c.Nodes[i].Healthy && !c.Nodes[i].Draining {
+			t += c.Nodes[i].AvailableCPU()
+		}
+	}
+	return t
 }
 
 func (c Cluster) TotalAvailableMemory() int {
-	return 0
+	m := 0
+	for i := range c.Nodes {
+		if c.Nodes[i].Healthy && !c.Nodes[i].Draining {
+			m += c.Nodes[i].AvailableMemory()
+		}
+	}
+	return m
 }
 
 func (c Cluster) Report() string {
-	return "ok"
+	var usedCPU, availableCPU, totalCPU int
+	var usedMemory, availableMemory, totalMemory int
+	var totalNodes int
+	var totalSchedulable int
+
+	report := "Cluster: " + c.Name + "\n" + "Nodes:" + "\n"
+	for i := range c.Nodes {
+		usedCPU += c.Nodes[i].UsedCPU
+		availableCPU += c.Nodes[i].AvailableCPU()
+		totalCPU += c.Nodes[i].CPU
+
+		usedMemory += c.Nodes[i].UsedMemory
+		availableMemory += c.Nodes[i].AvailableMemory()
+		totalMemory += c.Nodes[i].Memory
+
+		totalNodes++
+		if c.Nodes[i].Healthy && !c.Nodes[i].Draining {
+			totalSchedulable++
+		}
+
+		report += "Name: " + c.Nodes[i].Name + "\n" + "Status: " + c.Nodes[i].Status() + "\n" +
+			"CPU: " + "used=" + strconv.Itoa(c.Nodes[i].UsedCPU) + " available=" + strconv.Itoa(c.Nodes[i].AvailableCPU()) +
+			" total=" + strconv.Itoa(c.Nodes[i].CPU) + "\n" +
+			"Memory: " + "used=" + strconv.Itoa(c.Nodes[i].UsedMemory) + " available=" + strconv.Itoa(c.Nodes[i].AvailableMemory()) + " total=" + strconv.Itoa(c.Nodes[i].Memory) + "\n\n"
+	}
+
+	report += "Cluster Total: " + "\n" + "CPU: " + " used=" + strconv.Itoa(usedCPU) + " available=" + strconv.Itoa(c.TotalAvailableCPU()) + " total=" + strconv.Itoa(totalCPU) + "\n" +
+		"Memory: " + "used=" + strconv.Itoa(usedMemory) + " available=" + strconv.Itoa(c.TotalAvailableMemory()) + " total=" + strconv.Itoa(totalMemory) + "\n" +
+		"Nodes: " + "total=" + strconv.Itoa(len(c.Nodes)) + " healthy=" + strconv.Itoa(c.HealthyNodes()) + " schedulable=" + strconv.Itoa(totalSchedulable) + "\n"
+
+	return report
 }

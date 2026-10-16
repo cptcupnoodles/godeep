@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Node struct {
 	Name       string
@@ -21,6 +23,10 @@ func (n Node) AvailableMemory() int {
 }
 
 func (n Node) CanRun(cpu, memory int) bool {
+	if cpu <= 0 || memory <= 0 {
+		return false
+	}
+
 	if !n.Healthy {
 		fmt.Println("Selected node is not healthy")
 		return false
@@ -60,7 +66,7 @@ func (n *Node) Schedule(cpu, memory int) bool {
 }
 
 func (n *Node) Release(cpu, memory int) bool {
-	if cpu > n.UsedCPU || memory > n.UsedMemory {
+	if cpu > n.UsedCPU || memory > n.UsedMemory || cpu < 0 || memory < 0 {
 		return false
 	}
 
@@ -99,17 +105,49 @@ func (n Node) Status() string {
 }
 
 func FindMostAvailableNode(nodes []Node) *Node {
-	n := -1
-	most := 0
+	var node int
+	current := 0
+	found := false
 	for i := range nodes {
-		if nodes[i].AvailableCPU() >= most {
-			n = i
-			most = nodes[i].AvailableCPU()
+		if nodes[i].AvailableCPU() >= current && nodes[i].Healthy && !nodes[i].Draining {
+			node = i
+			current = nodes[i].AvailableCPU()
+			found = true
 		}
 	}
-	return &nodes[n]
+
+	if !found {
+		return nil
+	}
+	return &nodes[node]
 }
 
 func FindLeastLoadedNode(nodes []Node) *Node {
-	return &nodes[0]
+	var node int
+	var util float64
+	found := false
+	for i := range nodes {
+		if nodes[i].Healthy && !nodes[i].Draining && nodes[i].CPU > 0 && nodes[i].Memory > 0 {
+			cpu := float64(nodes[i].UsedCPU) / float64(nodes[i].CPU)
+			memory := float64(nodes[i].UsedMemory) / float64(nodes[i].Memory)
+			nodeUtil := max(cpu, memory)
+
+			if found {
+				if nodeUtil < util {
+					node = i
+					util = nodeUtil
+				}
+			} else {
+				node = i
+				util = nodeUtil
+				found = true
+			}
+		}
+	}
+
+	if !found {
+		return nil
+	}
+
+	return &nodes[node]
 }

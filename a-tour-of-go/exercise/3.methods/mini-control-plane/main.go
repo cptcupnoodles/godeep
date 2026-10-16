@@ -3,37 +3,40 @@ package main
 import "fmt"
 
 func main() {
-	nodes := []Node{
-		{
-			Name:       "Node Alpha",
-			CPU:        8,
-			Memory:     16,
-			UsedCPU:    4,
-			UsedMemory: 6,
-			Healthy:    true,
-			Draining:   false,
-		},
-		{
-			Name:       "Node Beta",
-			CPU:        8,
-			Memory:     16,
-			UsedCPU:    7,
-			UsedMemory: 14,
-			Healthy:    true,
-			Draining:   true,
-		},
-		{
-			Name:       "Node Charlie",
-			CPU:        8,
-			Memory:     16,
-			UsedCPU:    6,
-			UsedMemory: 8,
-			Healthy:    true,
-			Draining:   false,
-		},
+
+	nodes := []Node{}
+
+	nodeAlpha := Node{
+		Name:       "Node Alpha",
+		CPU:        8,
+		Memory:     16,
+		UsedCPU:    0,
+		UsedMemory: 0,
+		Healthy:    true,
+		Draining:   false,
 	}
 
-	nodex := Node{
+	nodeBeta := Node{
+		Name:       "Node Beta",
+		CPU:        8,
+		Memory:     16,
+		UsedCPU:    0,
+		UsedMemory: 0,
+		Healthy:    true,
+		Draining:   true,
+	}
+
+	nodeCharlie := Node{
+		Name:       "Node Charlie",
+		CPU:        8,
+		Memory:     16,
+		UsedCPU:    0,
+		UsedMemory: 0,
+		Healthy:    true,
+		Draining:   false,
+	}
+
+	nodeDelta := Node{
 		Name:       "Node Delta",
 		CPU:        12,
 		Memory:     32,
@@ -43,6 +46,7 @@ func main() {
 		Draining:   false,
 	}
 
+	// Create a cluster named production.
 	clusters := []Cluster{
 		{
 			Name:  "production",
@@ -50,27 +54,42 @@ func main() {
 		},
 	}
 
-	fmt.Println("Pre Schedule: ", nodes[0])
-	fmt.Println("Schedule: ", nodes[0].Schedule(4, 10))
-	fmt.Println("Post Schedule:", nodes[0])
+	// Add at least three nodes with different capacities.
+	clusters[0].AddNode(nodeAlpha)
+	clusters[0].AddNode(nodeBeta)
+	clusters[0].AddNode(nodeCharlie)
+	clusters[0].AddNode(nodeDelta)
 
-	fmt.Println("Release:", nodes[0].Release(4, 10))
-	fmt.Println("Post Release:", nodes[0])
-
-	fmt.Println(clusters)
-
-	clusters[0].AddNode(nodex)
-	fmt.Println(clusters)
-
+	// Schedule at least five workloads.
 	fmt.Println(clusters[0].ScheduleWorkload(2, 4))
-	fmt.Println(clusters)
+	fmt.Println(clusters[0].ScheduleWorkload(1, 3))
+	fmt.Println(clusters[0].ScheduleWorkload(6, 8))
+	fmt.Println(clusters[0].ScheduleWorkload(4, 4))
+	fmt.Println(clusters[0].ScheduleWorkload(2, 2))
 
-	fmt.Println(clusters[0].DrainNode("Node Delta"))
-	fmt.Println(clusters)
+	// Attempt to schedule a workload that cannot fit.
+	fmt.Println(clusters[0].ScheduleWorkload(12, 34))
 
-	// 	fmt.Println(clusters[0].FindNode("Node Beta"))
-	//
-	// 	fmt.Println(clusters[0].HealthyNodes())
+	// Mark one node unhealthy.
+	clusters[0].Nodes[0].MarkUnhealthy()
+	clusters[0].Nodes[0].Schedule(4, 8)
 
-	//fmt.Println(FindMostAvailableNode(nodes))
+	// Drain one healthy node.
+	clusters[0].DrainNode("Node Beta")
+	clusters[0].Nodes[1].Schedule(4, 8)
+
+	// Release resources from a node.
+	release := clusters[0].Nodes[2].Release(2, 2)
+	fmt.Println(release)
+
+	// Recover the unhealthy node.
+	clusters[0].RecoverNode("Node Alpha")
+
+	// Print a final cluster report.
+	fmt.Println(clusters[0].Report())
+
+	fmt.Println(clusters[0].FindNode("Node Beta"))
+	fmt.Println(clusters[0].HealthyNodes())
+	fmt.Println(FindMostAvailableNode(clusters[0].Nodes))
+	fmt.Println(FindLeastLoadedNode(clusters[0].Nodes))
 }
